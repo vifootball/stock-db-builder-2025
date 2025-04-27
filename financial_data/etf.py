@@ -3,13 +3,14 @@ import time
 import random
 import requests
 import pandas as pd
+from typing import Optional
 from datetime import datetime
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen, Request
 from utils.parse_str import *
 
 def get_symbols() -> list:
-    fname = "./manual_data/etf_list/etf_list_240605_union.csv"
+    fname = "./downloads/etf_list/etf_list_240605_union.csv"
     etf_list = pd.read_csv(fname)
     symbols = sorted(etf_list['symbol'].to_list())
     return symbols
@@ -57,4 +58,50 @@ def parse_etf_data(data: dict) -> pd.DataFrame:
     }
 
     return pd.DataFrame([etf_profile])
+
+
+def get_etf_holdings(symbol: str) -> Optional[pd.DataFrame]:
+
+    try:
+        url = f"https://api.stockanalysis.com/api/symbol/e/{symbol}/holdings"
+        response = requests.get(url)
+        response.raise_for_status()
+        etf_data = response.json().get("data", {})
+
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch holdings for {symbol}: {e}")
+        return None
+
+    holdings_raw = etf_data.get("holdings")
+    if not holdings_raw:
+        print(f"[WARNING] Empty holdings data for {symbol}")
+        return None
+
+    holdings = pd.DataFrame(holdings_raw)
+
+    holdings.rename(columns={
+        "s": "holding_symbol",
+        "n": "name",
+        "as": "weight",
+        "sh": "shares"
+    }, inplace=True)
+
+    for col in ["holding_symbol", "shares"]:
+        if col not in holdings.columns:
+            holdings[col] = "n/a"
+
+    holdings["symbol"] = symbol.upper()
+    holdings["holding_symbol"] = holdings["holding_symbol"].str.replace(r"^[$#]", "", regex=True)
+    holdings["weight"] = holdings["weight"].str.replace(",", "").apply(percentage_to_float)
+    holdings["shares"] = holdings["shares"].str.replace(",", "")
+
+    date_str = etf_data.get("date")
+    as_of_date = datetime.strptime(date_str, "%b %d, %Y").strftime("%Y-%m-%d") if date_str else None
+    holdings["as_of_date"] = as_of_date
+
+    holdings = holdings[[
+        "symbol", "as_of_date", "no", "holding_symbol", "name", "weight", "shares"
+    ]]
+
+    return holdings
 

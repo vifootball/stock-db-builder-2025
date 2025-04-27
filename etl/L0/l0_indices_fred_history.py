@@ -1,15 +1,23 @@
-from manual_data.etf_exclude import *
-from financial_data.etf import *
-from history.history import *
-from utils.csv_utils import *
 import os
+import time
+import random
 import logging
 from datetime import datetime
+from manual_data import indices_reference
+from history.history import *
 
+"""
+COLUMNS: 
+"symbol",
+"date",
+"close"
+"""
+
+# 여기서 선언해야 다른 로그들이랑 안꼬이는 듯
 def setup_logger():
-    log_dirpath = "logs/L0/l0_etf_history"
+    log_dirpath = "logs/L0/l0_indices_fred_history"
     now = datetime.now().strftime("%y%m%d_%H%M")
-    log_fname = f"l0_etf_history_{now}.log"
+    log_fname = f"l0_indices_fred_history_{now}.log"
 
     os.makedirs(log_dirpath, exist_ok=True)
     log_fpath = os.path.join(log_dirpath, log_fname)
@@ -24,39 +32,39 @@ def setup_logger():
         , force=True
     )
 
-# TODO: ray 구현
-def run_l0_etf_history():
+def run_l0_indices_fred_history():
     setup_logger()
-    
-    logging.info("Start: run_l0_etf_history")
 
-    # etf list 불러오기
-    etf_list = get_symbols()
-    etf_list = [x for x in etf_list if x not in ETF_EXCLUDE][:]
-    logging.info(f"Total ETFs to Process: {len(etf_list)}")
+    logging.info("Start: run_l0_fred_history")
 
-    # 파싱하여 저장
-    for symbol in etf_list:
+    # indices list 불러오기
+    fred_indices = indices_reference.FRED
+    fred_indices_list = [item["symbol"] for item in fred_indices]
+
+    # 수집하기
+    for symbol in fred_indices_list[:]:
         time.sleep(round(random.uniform(0.5, 1), 3))
         logging.info(f"[{symbol}] Fetching data")
 
         try:
             # 응답 획득
-            history = get_history_from_yf(symbol)
+            history = get_history_from_fred(symbol)
             # 파싱 후 저장
             if len(history):
                 logging.info(f"[{symbol}] Fetched rows: {len(history)}")
-                dirpath = 'downloads/l0_etf_history/'
+                dirpath = 'downloads/l0_indices_fred_history/'
                 os.makedirs(dirpath, exist_ok=True)
-                fpath = os.path.join(dirpath, f'l0_etf_history_{symbol}.csv')
+                fpath = os.path.join(dirpath, f'l0_indices_fred_history_{symbol}.csv')
 
                 history.to_csv(fpath, index=False)
                 logging.info(f"[{symbol}] Saved: {fpath} | Size: {history.shape[0]} rows x {history.shape[1]} columns")
-
+                
             else:
                 logging.warning(f"[{symbol}] No data returned or empty response")
 
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
 
-    logging.info("end: run_l0_etf_history")
+    logging.info("end: run_l0_indices_fred_history")
+
+    

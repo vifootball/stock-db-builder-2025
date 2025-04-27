@@ -15,8 +15,10 @@ def run_l0_indices_master():
 
     indices_yahoo = get_indices_masters_yahoo()
     indices_yahoo.to_csv(fpath_indices_yahoo, index=False)
+    print(f"Saved: {fpath_indices_yahoo} | Size: {indices_yahoo.shape[0]} rows x {indices_yahoo.shape[1]} columns")
 
     indices_fred = get_indices_masters_fred()
     indices_fred.to_csv(fpath_indices_fred, index=False)
+    print(f"Saved: {fpath_indices_fred} | Size: {indices_fred.shape[0]} rows x {indices_fred.shape[1]} columns")
 
     print("End: run_l0_indices_master")

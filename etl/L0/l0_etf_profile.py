@@ -5,22 +5,47 @@ import os
 import logging
 from datetime import datetime
 
+"""
+COLUMNS: 
+"symbol", 
+"asset_class", 
+"category", 
+"region", 
+"stock_exchange", 
+"provider", 
+"index_tracked", 
+"aum", 
+"nav", 
+"expense_ratio", 
+"shares_outstanding", 
+"dividend_yield", 
+"inception_date", 
+"description", 
+"holdings_count", 
+"holdings_top10_percentage", 
+"holdings_date"
+"""
 
-os.makedirs("logs/L0", exist_ok=True)
-now = datetime.now().strftime("%y%m%d_%H%M")
-log_path = os.path.join("logs/L0", f"l0_etf_profile_{now}.log")
+def setup_logger():
+    log_dirpath = "logs/L0/l0_etf_profile"
+    now = datetime.now().strftime("%y%m%d_%H%M")
+    log_fname = f"l0_etf_profile_{now}.log"
 
-logging.basicConfig(
-    format="%(asctime)s | %(levelname)s | %(message)s",
-    level=logging.INFO,  # DEBUG로 바꾸면 더 상세히 출력 가능
-    handlers=[
-        logging.FileHandler(log_path),  # 파일 저장
-        logging.StreamHandler()  # 콘솔에도 출력
-    ]
-    , force=True
-)
+    os.makedirs(log_dirpath, exist_ok=True)
+    log_fpath = os.path.join(log_dirpath, log_fname)
+    
+    logging.basicConfig(
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        level=logging.INFO,  # DEBUG로 바꾸면 더 상세히 출력 가능
+        handlers=[
+            logging.FileHandler(log_path),  # 파일 저장
+            logging.StreamHandler()  # 콘솔에도 출력
+        ]
+        , force=True
+    )
 
 def run_l0_etf_profile():
+    setup_logger()
 
     logging.info("Start: run_l0_etf_profile")
 

@@ -1,15 +1,14 @@
 from manual_data.etf_exclude import *
 from financial_data.etf import *
-from history.history import *
 from utils.csv_utils import *
 import os
 import logging
 from datetime import datetime
 
 def setup_logger():
-    log_dirpath = "logs/L0/l0_etf_history"
+    log_dirpath = "logs/L0/l0_etf_holdings"
     now = datetime.now().strftime("%y%m%d_%H%M")
-    log_fname = f"l0_etf_history_{now}.log"
+    log_fname = f"l0_etf_holdings_{now}.log"
 
     os.makedirs(log_dirpath, exist_ok=True)
     log_fpath = os.path.join(log_dirpath, log_fname)
@@ -25,14 +24,14 @@ def setup_logger():
     )
 
 # TODO: ray 구현
-def run_l0_etf_history():
+def run_l0_etf_holdings():
     setup_logger()
-    
-    logging.info("Start: run_l0_etf_history")
+
+    logging.info("Start: run_l0_etf_holdings")
 
     # etf list 불러오기
     etf_list = get_symbols()
-    etf_list = [x for x in etf_list if x not in ETF_EXCLUDE][:]
+    etf_list = [x for x in etf_list if x not in ETF_EXCLUDE][:10]
     logging.info(f"Total ETFs to Process: {len(etf_list)}")
 
     # 파싱하여 저장
@@ -42,16 +41,16 @@ def run_l0_etf_history():
 
         try:
             # 응답 획득
-            history = get_history_from_yf(symbol)
+            holdings = get_etf_holdings(symbol)
             # 파싱 후 저장
-            if len(history):
-                logging.info(f"[{symbol}] Fetched rows: {len(history)}")
-                dirpath = 'downloads/l0_etf_history/'
+            if len(holdings):
+                logging.info(f"[{symbol}] Fetched rows: {len(holdings)}")
+                dirpath = 'downloads/l0_etf_holdings/'
                 os.makedirs(dirpath, exist_ok=True)
-                fpath = os.path.join(dirpath, f'l0_etf_history_{symbol}.csv')
+                fpath = os.path.join(dirpath, f'l0_etf_holdings_{symbol}.csv')
 
-                history.to_csv(fpath, index=False)
-                logging.info(f"[{symbol}] Saved: {fpath} | Size: {history.shape[0]} rows x {history.shape[1]} columns")
+                holdings.to_csv(fpath, index=False)
+                logging.info(f"[{symbol}] Saved: {fpath} | Size: {holdings.shape[0]} rows x {holdings.shape[1]} columns")
 
             else:
                 logging.warning(f"[{symbol}] No data returned or empty response")
@@ -59,4 +58,4 @@ def run_l0_etf_history():
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
 
-    logging.info("end: run_l0_etf_history")
+    logging.info("end: run_l0_etf_holdings")
