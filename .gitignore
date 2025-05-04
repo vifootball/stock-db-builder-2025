@@ -20,6 +20,7 @@ time.csv
 timecheck.py
 config.py
 
+memo.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
