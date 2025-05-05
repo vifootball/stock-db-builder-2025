@@ -34,8 +34,8 @@ def run_l0_currency_history():
     currency_list = get_currencies()
 
     # 수집하기
-    for symbol in currency_list[:10]:
-        time.sleep(round(random.uniform(0.5, 1), 3))
+    for symbol in currency_list[:]:
+        time.sleep(round(random.uniform(0.2, 0.5), 3))
         logging.info(f"[{symbol}] Fetching data")
 
         try:

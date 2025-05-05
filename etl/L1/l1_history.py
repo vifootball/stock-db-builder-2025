@@ -4,6 +4,8 @@ import random
 import logging
 from datetime import datetime
 from history.preprocessor import *
+from tqdm import tqdm
+
 
 def setup_logger():
     log_dirpath = "logs/L1/l1_history"
@@ -30,7 +32,7 @@ def run_l1_history():
 
     # etf history
     etf_history_paths = [os.path.join('downloads/l0_etf_history', f) for f in sorted(os.listdir('downloads/l0_etf_history')) if f.endswith('.csv')][:]
-    for etf_history_path in etf_history_paths:
+    for etf_history_path in tqdm(etf_history_paths, mininterval=0.5):
         symbol = etf_history_path.split('_')[-1].split('.')[0]
         
         try:
@@ -92,7 +94,7 @@ def run_l1_history():
     # index fred history
     index_fred_history_paths = [os.path.join('downloads/l0_indices_fred_history', f) for f in sorted(os.listdir('downloads/l0_indices_fred_history')) if f.endswith('.csv')][:]
     for index_fred_history_path in index_fred_history_paths:
-        symbol = index_fred_history_path.split('_')[-1].split('.')
+        symbol = index_fred_history_path.split('_')[-1].split('.')[0]
         
         try:
             logging.info(f"[{symbol}] Processing")

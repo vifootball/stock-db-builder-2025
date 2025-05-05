@@ -31,12 +31,12 @@ def run_l0_etf_holdings():
 
     # etf list 불러오기
     etf_list = get_symbols()
-    etf_list = [x for x in etf_list if x not in ETF_EXCLUDE][:10]
+    etf_list = [x for x in etf_list if x not in ETF_EXCLUDE][:]
     logging.info(f"Total ETFs to Process: {len(etf_list)}")
 
     # 파싱하여 저장
     for symbol in etf_list:
-        time.sleep(round(random.uniform(0.5, 1), 3))
+        time.sleep(round(random.uniform(0.2, 0.5), 3))
         logging.info(f"[{symbol}] Fetching data")
 
         try:

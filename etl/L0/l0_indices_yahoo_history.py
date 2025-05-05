@@ -42,7 +42,7 @@ def run_l0_indices_yahoo_history():
 
     # 수집하기
     for symbol in indices_list[:]:
-        time.sleep(round(random.uniform(0.5, 1), 3))
+        time.sleep(round(random.uniform(0.2, 0.5), 3))
         logging.info(f"[{symbol}] Fetching data")
 
         try:
