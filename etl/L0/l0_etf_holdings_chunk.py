@@ -4,9 +4,9 @@ import logging
 from datetime import datetime
 
 def setup_logger():
-    log_dirpath = "logs/L0/l0_etf_holdings"
+    log_dirpath = "logs/L0/l0_etf_holdings_chunk"
     now = datetime.now().strftime("%y%m%d_%H%M")
-    log_fname = f"l0_etf_holdings_{now}.log"
+    log_fname = f"l0_etf_holdings_chunk_{now}.log"
 
     os.makedirs(log_dirpath, exist_ok=True)
     log_fpath = os.path.join(log_dirpath, log_fname)

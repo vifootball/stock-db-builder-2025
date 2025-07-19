@@ -25,10 +25,9 @@ def setup_logger():
         , force=True
     )
 
-def run_l1_history():
+def run_l1_etf_history():
     setup_logger()
-    logging.info("Start: run_l1_history")
-    
+    logging.info("Start: run_l1_etf_history")
 
     # etf history
     etf_history_paths = [os.path.join('downloads/l0_etf_history', f) for f in sorted(os.listdir('downloads/l0_etf_history')) if f.endswith('.csv')][:]
@@ -40,7 +39,6 @@ def run_l1_history():
             etf_history = pd.read_csv(etf_history_path)
             etf_history = transform_history(etf_history)
             
-            
             path_to_save = os.path.join(f'downloads/l1_etf_history/l1_etf_history_{symbol}.csv')
             os.makedirs(os.path.dirname(path_to_save), exist_ok=True)
 
@@ -50,6 +48,12 @@ def run_l1_history():
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
 
+    logging.info("End: run_l1_etf_history")
+
+
+def run_l1_currency_history():
+    setup_logger()
+    logging.info("Start: run_l1_currency_history")
 
     # currency history
     currency_history_paths = [os.path.join('downloads/l0_currency_history', f) for f in sorted(os.listdir('downloads/l0_currency_history')) if f.endswith('.csv')][:]
@@ -70,6 +74,12 @@ def run_l1_history():
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
     
+    logging.info("End: run_l1_indices_fred_history")
+
+
+def run_l1_indices_yahoo_history():
+    setup_logger()
+    logging.info("Start: run_l1_indices_yahoo_history")
 
     # index yahoo history
     index_yahoo_history_paths = [os.path.join('downloads/l0_indices_yahoo_history', f) for f in sorted(os.listdir('downloads/l0_indices_yahoo_history')) if f.endswith('.csv')][:]
@@ -89,8 +99,13 @@ def run_l1_history():
         
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
+    
+    logging.info("End: run_l1_indices_yahoo_history")
 
 
+def run_l1_indices_fred_history():
+    setup_logger()
+    logging.info("Start: run_l1_indices_fred_history")
     # index fred history
     index_fred_history_paths = [os.path.join('downloads/l0_indices_fred_history', f) for f in sorted(os.listdir('downloads/l0_indices_fred_history')) if f.endswith('.csv')][:]
     for index_fred_history_path in index_fred_history_paths:
@@ -114,6 +129,5 @@ def run_l1_history():
         
         except Exception as e:
             logging.error(f"[{symbol}] Error occurred: {e}")
-
-
-    logging.info("end: run_l0_currency_history")
+    
+    logging.info("End: run_l1_indices_fred_history")
