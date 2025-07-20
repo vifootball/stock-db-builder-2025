@@ -18,7 +18,7 @@ def setup_logger():
         level=logging.INFO,  # DEBUG로 바꾸면 더 상세히 출력 가능
         handlers=[
             logging.FileHandler(log_fpath),  # 파일 저장
-            logging.StreamHandler()  # 콘솔에도 출력
+            logging.StreamHandler()          # 콘솔에도 출력
         ]
         , force=True
     )
