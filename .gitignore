@@ -3,6 +3,8 @@ logs/
 
 etf_list/
 
+config/
+
 qnd.ipynb
 
 .DS_Store
@@ -19,7 +21,7 @@ main.bat
 time.csv
 timecheck.py
 config.py
-
+*_config.py  # config로 끝나는 파이썬 파일
 memo.txt
 
 # Byte-compiled / optimized / DLL files
