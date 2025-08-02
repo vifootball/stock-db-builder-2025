@@ -1,0 +1,18 @@
+# 깃헙 말고 개인 저장소에 파일명_날짜로 백업한다
+
+postgresql_db_profiles:
+
+  connection_test: # 테스트 목적: postgres에서 기본적으로 생성되는 db
+    host: localhost           # 호스트 주소
+    port: 5432                # 포트 번호, 기본값은 5432
+    database: postgres        # 연결할 데이터베이스 이름
+    user: usernmae            # 데이터베이스 사용자 이름
+    password: "0000"          # 해당 사용자의 비밀번호
+
+  connection:
+    host: localhost           # 호스트 주소
+    port: 5432                # 포트 번호, 기본값은 5432
+    database: dbname          # 연결할 데이터베이스 이름
+    user: username            # 데이터베이스 사용자 이름
+    password: "0000"          # 해당 사용자의 비밀번호
+
