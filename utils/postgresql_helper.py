@@ -164,3 +164,92 @@ def summarize_tables_in_schema(connection_name: str, schema: str = 'public') -> 
     conn.close()
 
     return pd.DataFrame(summary)
+
+
+def create_database(connection_name, database_name):
+    conn = connect_db(connection_name)
+    print(f"Database Connected for create_database({database_name})")
+
+    # autocommit 설정
+    conn.autocommit = True
+
+    try:
+        with conn.cursor() as cursor:
+            # 데이터베이스 존재 여부 확인
+            cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = %s;", (database_name,))
+            exists = cursor.fetchone()
+
+            # 데이터베이스가 없으면 생성
+            if not exists:
+                cursor.execute(f"CREATE DATABASE {database_name};")
+                print(f"Database '{database_name}' created successfully.")
+            else:
+                print(f"Database '{database_name}' already exists.")
+
+    except psycopg2.Error as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # 연결 닫기
+        conn.close()
+
+# Database - Schema - Table 구조인데, Schema를 명시하지 않으면 자동으로 'public' 스키마로 들어감
+def copy_csv_file_to_db(csv_file_path: str, connection_name: str, table_name: str, create_table_sql_path: str, mode: str = "replace"):
+    """
+    단일 CSV 파일을 PostgreSQL에 업로드하는 함수.
+
+    Args:
+        csv_file_path (str): 업로드할 CSV 파일 경로
+        table_name (str): 데이터를 저장할 테이블 이름
+        create_table_query (str): 테이블 생성 쿼리문 (replace 모드에서만 사용)
+        mode (str): 'replace' 또는 'append'
+    """
+    if mode not in ("replace", "append"):
+        raise ValueError("[ERROR] mode must be either 'replace' or 'append'.")
+
+    # SQL 파일 로드
+    if mode == "replace":
+        if not os.path.isfile(create_table_sql_path):
+            raise FileNotFoundError(f"[ERROR] SQL file not found: {create_table_sql_path}")
+        with open(create_table_sql_path, "r") as file:
+            create_table_query = file.read()
+
+    conn = connect_db(connection_name)
+
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+
+                if mode == "replace":
+                    # (1) 기존 테이블 삭제 및 생성
+                    print(f"[{table_name}] Drop table if exists: Started")
+                    cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
+                    print(f"[{table_name}] Drop table if exists: Completed\n")
+
+                    print(f"[{table_name}] Create table: Started")
+                    cursor.execute(create_table_query)
+                    print(f"[{table_name}] Create table: Completed\n")
+
+                elif mode == "append":
+                    print(f"[{table_name}] Append mode: Append to existing table '{table_name}'\n")
+
+                # (2) CSV 데이터 업로드
+                print(f"[{table_name}] Uploading from '{csv_file_path}': Started")
+                with open(csv_file_path, 'r') as f:
+                    cursor.copy_expert(
+                        f"COPY {table_name} FROM STDIN WITH CSV HEADER DELIMITER ','", f
+                    )
+                print(f"[{table_name}] Uploading: Completed")
+
+                # (3) 업로드된 행 수 확인
+                cursor.execute(f"SELECT COUNT(*) FROM {table_name};")
+                row_count = cursor.fetchone()[0]
+                print(f"[{table_name}] Total rows after upload: {row_count}\n")
+
+    except Exception as e:
+        print(f"[ERROR] Failed to load CSV into '{table_name}': {e}")
+        conn.rollback()
+
+    finally:
+        conn.close()
+
