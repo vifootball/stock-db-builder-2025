@@ -1,6 +1,7 @@
 import os
 import yaml
 import psycopg2
+import logging
 import pandas as pd
 
 def load_db_config(connection_name: str, config_path="config/config.yaml") -> dict:
@@ -222,34 +223,111 @@ def copy_csv_file_to_db(csv_file_path: str, connection_name: str, table_name: st
 
                 if mode == "replace":
                     # (1) 기존 테이블 삭제 및 생성
-                    print(f"[{table_name}] Drop table if exists: Started")
+                    logging.info(f"[{table_name}] Drop table if exists: Started")
                     cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
-                    print(f"[{table_name}] Drop table if exists: Completed\n")
+                    logging.info(f"[{table_name}] Drop table if exists: Completed")
 
-                    print(f"[{table_name}] Create table: Started")
+                    logging.info(f"[{table_name}] Create table: Started")
                     cursor.execute(create_table_query)
-                    print(f"[{table_name}] Create table: Completed\n")
+                    logging.info(f"[{table_name}] Create table: Completed")
 
                 elif mode == "append":
-                    print(f"[{table_name}] Append mode: Append to existing table '{table_name}'\n")
+                    logging.info(f"[{table_name}] Append mode: Append to existing table '{table_name}'")
 
                 # (2) CSV 데이터 업로드
-                print(f"[{table_name}] Uploading from '{csv_file_path}': Started")
+                logging.info(f"[{table_name}] Uploading from '{csv_file_path}': Started")
                 with open(csv_file_path, 'r') as f:
                     cursor.copy_expert(
                         f"COPY {table_name} FROM STDIN WITH CSV HEADER DELIMITER ','", f
                     )
-                print(f"[{table_name}] Uploading: Completed")
+                logging.info(f"[{table_name}] Uploading: Completed")
 
                 # (3) 업로드된 행 수 확인
                 cursor.execute(f"SELECT COUNT(*) FROM {table_name};")
                 row_count = cursor.fetchone()[0]
-                print(f"[{table_name}] Total rows after upload: {row_count}\n")
+                logging.info(f"[{table_name}] Total rows after upload: {row_count}")
 
     except Exception as e:
-        print(f"[ERROR] Failed to load CSV into '{table_name}': {e}")
+        logging.info(f"[ERROR] Failed to load CSV into '{table_name}': {e}")
         conn.rollback()
 
+    finally:
+        conn.close()
+
+
+import os
+import logging
+
+def copy_csv_files_to_db(
+    csv_dir_path: str,
+    connection_name: str,
+    table_name: str,
+    create_table_sql_path: str,
+    mode: str = "replace",
+):
+    """
+    폴더 내 모든 CSV를 PostgreSQL 테이블에 업로드.
+
+    Args:
+        csv_dir_path (str): CSV 파일들이 위치한 디렉터리
+        connection_name (str): config.yaml에 정의된 DB 연결 이름
+        table_name (str): 적재 대상 테이블명
+        create_table_sql_path (str): 테이블 생성 SQL 파일 경로 (replace 모드에서 사용)
+        mode (str): 'replace' | 'append'
+    """
+    if mode not in ("replace", "append"):
+        raise ValueError("[ERROR] mode must be either 'replace' or 'append'.")
+
+    # 업로드 대상 파일 수집
+    filenames = sorted([f for f in os.listdir(csv_dir_path) if f.lower().endswith(".csv")])
+    if not filenames:
+        logging.warning(f"[{table_name}] No CSV files found in: {csv_dir_path}")
+        return
+
+    # SQL 로드 (replace일 때만 필요)
+    create_table_query = None
+    if mode == "replace":
+        if not os.path.isfile(create_table_sql_path):
+            raise FileNotFoundError(f"[ERROR] SQL file not found: {create_table_sql_path}")
+        with open(create_table_sql_path, "r") as f:
+            create_table_query = f.read()
+
+    conn = connect_db(connection_name)
+
+    try:
+        with conn:
+            with conn.cursor() as cursor:
+                if mode == "replace":
+                    logging.info(f"[{table_name}] Drop table if exists: Started")
+                    cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
+                    logging.info(f"[{table_name}] Drop table if exists: Completed")
+
+                    logging.info(f"[{table_name}] Create table: Started")
+                    cursor.execute(create_table_query)
+                    logging.info(f"[{table_name}] Create table: Completed")
+                else:
+                    logging.info(f"[{table_name}] Append mode: Using existing table")
+
+                total = len(filenames)
+                for idx, fname in enumerate(filenames, start=1):
+                    fpath = os.path.join(csv_dir_path, fname)
+                    logging.info(f"[{table_name}] [{idx}/{total}] COPY from '{fpath}': Started")
+                    with open(fpath, "r") as f:
+                        cursor.copy_expert(
+                            f"COPY {table_name} FROM STDIN WITH CSV HEADER DELIMITER ','",
+                            f
+                        )
+                    logging.info(f"[{table_name}] [{idx}/{total}] COPY: Completed")
+
+                    # 누적 로우 카운트 확인
+                    cursor.execute(f"SELECT COUNT(*) FROM {table_name};")
+                    row_count = cursor.fetchone()[0]
+                    logging.info(f"[{table_name}] Rows after '{fname}': {row_count}")
+
+    except Exception as e:
+        logging.exception(f"[{table_name}] Failed to load CSVs from '{csv_dir_path}'")
+        conn.rollback()
+        raise
     finally:
         conn.close()
 
