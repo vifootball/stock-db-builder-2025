@@ -208,7 +208,7 @@ def copy_csv_file_to_db(csv_file_path: str, connection_name: str, table_name: st
     if mode not in ("replace", "append"):
         raise ValueError("[ERROR] mode must be either 'replace' or 'append'.")
 
-    # SQL 파일 로드
+    # SQL 파일 로드: replace 모드에서만 create table 쿼리문 로드
     if mode == "replace":
         if not os.path.isfile(create_table_sql_path):
             raise FileNotFoundError(f"[ERROR] SQL file not found: {create_table_sql_path}")

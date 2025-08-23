@@ -66,13 +66,13 @@ def run_l2_grade():
     # (4) 수집한 Grades를 Concat & 저장
     logging.info("Concatenating Grades: Start")
     grades = pd.concat(grades).reset_index(drop=True)
-    grades.to_csv('./downloads/l2_etf_grade.csv', index=False)
+    grades.to_csv('./downloads/l2_grade.csv', index=False)
     logging.info("Concatenating Grades: End")
 
     # (5) Concat한 Grades를 Pivot & 저장
     logging.info("Pivotting Grades: Start")
     grades_pivotted = pivot_grades(grades)
-    grades_pivotted.to_csv('./downloads/l2_etf_grade_pivot.csv', index=False)
+    grades_pivotted.to_csv('./downloads/l2_grade_pivot.csv', index=False)
     logging.info("Pivotting Grades: Start")
 
     logging.info("End: run_l2_grade")
