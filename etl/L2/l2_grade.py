@@ -6,31 +6,33 @@ import pandas as pd
 from datetime import datetime
 from history.grade import *
 from tqdm import tqdm
+from utils.logging_helper import *
 
 
+# def setup_logger():
+#     log_dirpath = "logs/L2/l2_grade"
+#     now = datetime.now().strftime("%y%m%d_%H%M")
+#     log_fname = f"l0_indices_yahoo_history_{now}.log"
 
-def setup_logger():
-    log_dirpath = "logs/L2/l2_grade"
-    now = datetime.now().strftime("%y%m%d_%H%M")
-    log_fname = f"l0_indices_yahoo_history_{now}.log"
+#     os.makedirs(log_dirpath, exist_ok=True)
+#     log_fpath = os.path.join(log_dirpath, log_fname)
 
-    os.makedirs(log_dirpath, exist_ok=True)
-    log_fpath = os.path.join(log_dirpath, log_fname)
-
-    logging.basicConfig(
-        format="%(asctime)s | %(levelname)s | %(message)s",
-        level=logging.INFO,  # DEBUG로 바꾸면 더 상세히 출력 가능
-        handlers=[
-            logging.FileHandler(log_fpath),  # 파일 저장
-            logging.StreamHandler()  # 콘솔에도 출력
-        ]
-        , force=True
-    )
+#     logging.basicConfig(
+#         format="%(asctime)s | %(levelname)s | %(message)s",
+#         level=logging.INFO,  # DEBUG로 바꾸면 더 상세히 출력 가능
+#         handlers=[
+#             logging.FileHandler(log_fpath),  # 파일 저장
+#             logging.StreamHandler()  # 콘솔에도 출력
+#         ]
+#         , force=True
+#     )
 
 # TBD 로깅 추가
 def run_l2_grade():
     setup_logger()
-    logging.info("Start: run_l2_grade")
+    enter_root()
+    function_name = inspect.currentframe().f_code.co_name
+    logging.info(f"Start: {function_name}")
 
     # (1) 고정 데이터 로드
     # (2) History 데이터 경로 설정
@@ -75,4 +77,4 @@ def run_l2_grade():
     grades_pivotted.to_csv('./downloads/l2_grade_pivot.csv', index=False)
     logging.info("Pivotting Grades: Start")
 
-    logging.info("End: run_l2_grade")
+    logging.info(f"End: {function_name}")
