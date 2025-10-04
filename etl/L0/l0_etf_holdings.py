@@ -9,6 +9,7 @@ from utils.logging_helper import *
 # TODO: ray 구현
 def run_l0_etf_holdings():
     setup_logger()
+    reset_root()
     enter_root()
     function_name = inspect.currentframe().f_code.co_name
     logging.info(f"Start: {function_name}")

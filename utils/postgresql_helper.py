@@ -168,6 +168,7 @@ def summarize_tables_in_schema(connection_name: str, schema: str = 'public') -> 
 
 
 def create_database(connection_name, database_name):
+    # 기본 db가 존재하는 테스트용 연결
     conn = connect_db(connection_name)
     print(f"Database Connected for create_database({database_name})")
 
