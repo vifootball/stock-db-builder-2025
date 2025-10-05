@@ -47,6 +47,14 @@ def main():
     upload_l2_grade(connection_name="mac", mode="replace")
     upload_l2_grade_pivot(connection_name="mac", mode="replace")
 
+    upload_l0_etf_holdings_chunk(connection_name="win", mode="replace")
+    upload_l1_etf_history_chunk(connection_name="win", mode="replace") # 첫번쨰만 replace, 나머지는 append
+    upload_l1_currency_history_chunk(connection_name="win", mode="append")
+    upload_l1_indices_yahoo_history_chunk(connection_name="win", mode="append")
+    upload_l1_indices_fred_history_chunk(connection_name="win", mode="append")
+    upload_l2_grade(connection_name="win", mode="replace")
+    upload_l2_grade_pivot(connection_name="win", mode="replace")
+
 if __name__ == "__main__":
     main()
 
