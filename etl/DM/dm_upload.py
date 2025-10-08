@@ -4,7 +4,7 @@ from datetime import datetime
 from utils.postgresql_helper import *
 from utils.logging_helper import *
 
-def upload_l1_symbol_master(connection_name):
+def upload_l1_symbol_master(connection_name, mode):
     setup_logger()
     enter_root()
     function_name = inspect.currentframe().f_code.co_name
@@ -16,7 +16,7 @@ def upload_l1_symbol_master(connection_name):
             connection_name = connection_name,
             table_name = "l1_symbol_master",
             create_table_sql_path = "sql/create_table_l1_symbol_master.sql",
-            mode = "replace"
+            mode = mode
         )
     except Exception as e:
         logging.error(f"[{upload_l1_symbol_master}] Error occurred: {e}")
