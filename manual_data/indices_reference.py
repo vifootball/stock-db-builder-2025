@@ -80,6 +80,20 @@ YAHOO_COMMODITIES = [
     {'symbol': 'SB=F', 'name': 'Sugar'}
 ]
 
+YAHOO_CRYPTOS = [
+    # https://finance.yahoo.com/markets/crypto/all/
+    {'symbol': 'BTC-USD', 'name': 'Bitcoin USD'},
+    {'symbol': 'ETH-USD', 'name': 'Ethereum USD'},
+    {'symbol': 'USDT-USD', 'name': 'Tether USD'},
+    {'symbol': 'BNB-USD', 'name': 'BNB USD'},
+    {'symbol': 'SOL-USD', 'name': 'Solana USD'},
+    {'symbol': 'XRP-USD', 'name': 'XRP USD'},
+    {'symbol': 'DOGE-USD', 'name': 'Dogecoin USD'},
+    {'symbol': 'ADA-USD', 'name': 'Cardano USD'},
+    {'symbol': 'AVAX-USD', 'name': 'Avalanche USD'},
+    {'symbol': 'DOT-USD', 'name': 'Polkadot USD'}
+]
+
 FRED = [
     {'symbol': 'CPIAUCSL', 'name': 'Consumer Price Index for All Urban Consumers: All Items in U.S. City Average'},
     {'symbol': 'EFFR', 'name': 'Effective Federal Funds Rate'},

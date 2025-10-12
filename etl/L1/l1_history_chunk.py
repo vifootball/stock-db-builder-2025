@@ -60,7 +60,7 @@ def run_l1_currency_history_chunk():
     try:
         save_dfs_by_chunk(
             get_dirpath='downloads/l1_currency_history/',
-            put_dirpath='downloads/l1_currency_chunk/',
+            put_dirpath='downloads/l1_currency_history_chunk/',
             prefix_chunk='currency_history_chunk'
         )
     except Exception as e:

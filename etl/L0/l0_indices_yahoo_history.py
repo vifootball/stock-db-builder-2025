@@ -20,8 +20,11 @@ def run_l0_indices_yahoo_history():
     yahoo_commodities = indices_reference.YAHOO_COMMODITIES
     yahoo_commodities_list = [item["symbol"] for item in yahoo_commodities]
 
+    yahoo_cryptos = indices_reference.YAHOO_CRYPTOS
+    yahoo_cryptos_list = [item["symbol"] for item in yahoo_cryptos]
+
     # list 합치기
-    indices_list = yahoo_world_indices_list + yahoo_commodities_list
+    indices_list = yahoo_world_indices_list + yahoo_commodities_list + yahoo_cryptos_list
     total_len = len(indices_list)
 
     # 수집하기
